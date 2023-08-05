@@ -3,6 +3,7 @@ import 'package:blogapp/Homepage/Provider/provider.dart';
 import 'package:blogapp/Homepage/View/homepage.dart';
 import 'package:blogapp/SecondBlogPage/Provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 
@@ -11,6 +12,10 @@ import 'NativeShare/share.dart';
 
 
 void main() {
+   SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   runApp(MyApp());
 }
 

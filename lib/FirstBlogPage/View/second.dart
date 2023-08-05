@@ -1,6 +1,9 @@
+import 'package:blogapp/Common_Widgets/CustomText.dart';
 import 'package:blogapp/FirstBlogPage/Models/blog.dart';
 import 'package:blogapp/FirstBlogPage/Models/imageblog.dart';
 import 'package:blogapp/FirstBlogPage/Provider/provider.dart';
+import 'package:blogapp/Homepage/Image/image.dart';
+import 'package:blogapp/Homepage/Provider/provider.dart';
 import 'package:blogapp/Homepage/View/homepage.dart';
 import 'package:blogapp/NativeShare/share.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +24,20 @@ class SecondSecondBlog extends StatefulWidget {
 
 class _SecondSecondBlogState extends State<SecondSecondBlog> {
   String? shareul;
+  final blogListView = BlogListView();
+
+  List ImageJson = [
+    {
+      "image": "assets/image.png",
+    },
+    {
+      "image": "assets/imageone.png",
+    },
+    {
+      "image": "assets/imagetwo.png",
+    },
+    {"image": "assets/imagethree.png"}
+  ];
   @override
   void initState() {
     super.initState();
@@ -40,6 +57,118 @@ class _SecondSecondBlogState extends State<SecondSecondBlog> {
         extension == 'png' ||
         extension == 'gif';
   }
+
+  @override
+  Widget build(BuildContext context) {
+    var h = MediaQuery.of(context).size.height;
+    var w = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: InkWell(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => BlogListView()));
+            },
+            child: Container(
+              height: MediaQuery.of(context).size.width * 0.1,
+              width: MediaQuery.of(context).size.width * 0.2,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("assets/back.png"))),
+            )),
+      ),
+      body: Container(
+        child: Consumer<SecondBlogSecondListProvider>(
+          builder: (context, provider, _) {
+            return Column(
+              children: [
+                provider.isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                        ),
+                      )
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: provider.displayedSecondBlogs.length,
+                          itemBuilder: (context, index) {
+                            final SecondBlog =
+                                provider.displayedSecondBlogs[index];
+
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 1,
+                                  horizontal:
+                                      16), // Add padding around the ListTile
+                              child: InkWell(
+                                onTap: () {
+                                  print(index);
+                                },
+                                child: Column(
+                                  children: [
+                                    buildMediaWidget(SecondBlog),
+                                    RichText(
+                                      text: SecondBlog.concatenatedContent,
+                                      textAlign: TextAlign.start,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ],
+            );
+          },
+        ),
+      ),
+      bottomSheet: Container(
+        height: 220,
+        //  color: Colors.blue,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Recommended",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: ImageJson.length,
+                itemBuilder: (context, index) {
+                  final imageInfo = ImageJson[index];
+                  return Container(
+                    width: 200,
+                    height: 100,
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(imageInfo['image']),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+//imageeeeeee or video
 
   bool isVideoURL(String url) {
     final uri = Uri.tryParse(url);
@@ -66,12 +195,16 @@ class _SecondSecondBlogState extends State<SecondSecondBlog> {
             return Text('Error loading image');
           } else {
             // Image fetched successfully, display the image with the share icon
+
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Image.network(SecondBlog.url),
+                  child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      child: Image.network(SecondBlog.url)),
                 ),
                 IconButton(
                   icon: Icon(
@@ -119,7 +252,7 @@ class _SecondSecondBlogState extends State<SecondSecondBlog> {
             ),
             onPressed: () {
               Provider.of<share>(context, listen: false)
-                        .Nativeshare(shareurl: SecondBlog.url);
+                  .Nativeshare(shareurl: SecondBlog.url);
             },
           ),
         ],
@@ -128,76 +261,5 @@ class _SecondSecondBlogState extends State<SecondSecondBlog> {
       // Handle other types of media if needed, or return an empty container.
       return Container();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var h = MediaQuery.of(context).size.height;
-    var w = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: InkWell(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => BlogListView()));
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-            size: 24,
-          ),
-        ),
-      ),
-      body: Container(
-        child: Consumer<SecondBlogSecondListProvider>(
-          builder: (context, provider, _) {
-            return Column(
-              children: [
-                provider.isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.black,
-                        ),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: provider.displayedSecondBlogs.length,
-                          itemBuilder: (context, index) {
-                            final SecondBlog =
-                                provider.displayedSecondBlogs[index];
-
-                            return Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 1,
-                                  horizontal:
-                                      16), // Add padding around the ListTile
-                              child: InkWell(
-                                onTap: () {
-                                  print(index);
-                                },
-                                child: Column(
-                                  children: [
-                                    // SecondBlog.url.startsWith('https')?Image.network(SecondBlog.url):SizedBox(),
-                                    buildMediaWidget(SecondBlog),
-                                    // SecondBlog.content[0]
-                                    RichText(
-                                      text: SecondBlog.concatenatedContent,
-                                      textAlign: TextAlign.start,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:blogapp/CustomFields/customtext.dart';
 import 'package:blogapp/FirstBlogPage/View/second.dart';
+import 'package:blogapp/Homepage/Image/image.dart';
 import 'package:blogapp/Homepage/Models/blog.dart';
 import 'package:blogapp/Homepage/Models/imageblock.dart';
 import 'package:blogapp/Homepage/Provider/provider.dart';
@@ -26,70 +27,6 @@ class _BlogListViewState extends State<BlogListView> {
     });
   }
 
-  bool isImageURL(String url) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || uri.pathSegments.isEmpty) return false;
-
-    final String extension = uri.pathSegments.last.toLowerCase();
-    return extension == 'jpg' ||
-        extension == 'jpeg' ||
-        extension == 'png' ||
-        extension == 'gif';
-  }
-
-  bool isVideoURL(String url) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || uri.pathSegments.isEmpty) return false;
-
-    final String extension = uri.pathSegments.last.toLowerCase();
-    return extension == 'mp4' || extension == 'avi' || extension == 'mov';
-  }
-
-  Widget buildMediaWidget(Blog blog) {
-    if (blog is ImageBlock) {
-      // Check if the blog is an ImageBlock
-      // Return a FutureBuilder for image fetching
-      return FutureBuilder(
-        future: blog.fetchImage(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // While waiting for image to load, display a placeholder
-            return CircularProgressIndicator(
-              color: Colors.black,
-            );
-          } else if (snapshot.hasError) {
-            // If there's an error, display an error message
-            return Text('Error loading image');
-          } else {
-            // Image fetched successfully, display the image
-            return Image.network(blog.url);
-          }
-        },
-      );
-    } else if (isVideoURL(blog.url)) {
-      // Return a FutureBuilder for video fetching
-      final videoPlayerController =
-          VideoPlayerController.networkUrl(blog.url as Uri);
-      final chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
-        autoPlay: true,
-        looping: false,
-        aspectRatio: 16 / 9,
-        autoInitialize: true,
-        errorBuilder: (context, errorMessage) {
-          return Center(
-            child: Text(errorMessage),
-          );
-        },
-      );
-
-      return Chewie(controller: chewieController);
-    } else {
-      // Handle other types of media if needed, or return an empty container.
-      return Container();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var h = MediaQuery.of(context).size.height;
@@ -102,14 +39,7 @@ class _BlogListViewState extends State<BlogListView> {
           height: MediaQuery.of(context).size.width * 0.1,
           width: MediaQuery.of(context).size.width * 0.2,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.black,
-          ),
-          child: Icon(
-            Icons.format_bold_outlined,
-            color: Colors.white,
-            size: 24,
-          ),
+              image: DecorationImage(image: AssetImage("assets/logo.png"))),
         ),
         actions: [
           Container(
@@ -121,13 +51,14 @@ class _BlogListViewState extends State<BlogListView> {
                     Provider.of<BlogListProvider>(context, listen: false)
                         .filterBlogs(value),
                 decoration: InputDecoration(
-                  border: InputBorder.none,
-                  suffixIcon: Icon(
-                    Icons.search_sharp,
-                    color: Colors.black,
-                    size: 28,
-                  ),
-                )),
+                    border: InputBorder.none,
+                    suffixIcon: Container(
+                      height: MediaQuery.of(context).size.width * 0.1,
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("assets/search.png"))),
+                    ))),
           ),
         ],
       ),
@@ -138,10 +69,10 @@ class _BlogListViewState extends State<BlogListView> {
               children: [
                 provider.isLoading
                     ? Center(
-                      child: CircularProgressIndicator(
+                        child: CircularProgressIndicator(
                           color: Colors.black,
                         ),
-                    )
+                      )
                     : Expanded(
                         child: ListView.builder(
                           itemCount: provider.displayedBlogs.length,
@@ -181,8 +112,9 @@ class _BlogListViewState extends State<BlogListView> {
                                 },
                                 child: Column(
                                   children: [
-                                    // blog.url.startsWith('https')?Image.network(blog.url):SizedBox(),
-                                    buildMediaWidget(blog),
+                                    // buildMediaWidget(blog),
+
+                                    MediaWidget(context: context, media: blog),
                                     // blog.content[0]
                                     RichText(
                                       text: blog.concatenatedContent,
@@ -203,3 +135,13 @@ class _BlogListViewState extends State<BlogListView> {
     );
   }
 }
+
+// class ParentWidget extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return ChangeNotifierProvider(
+//       create: (_) => BlogListProvider(),
+//       child: SecondSecondBlog(),
+//     );
+//   }
+// }

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:blogapp/Homepage/Models/blogspan.dart';
 import 'package:blogapp/Homepage/Models/imageblock.dart';
 import 'package:blogapp/Homepage/Models/paragraphblock.dart';
-import 'package:flutter/material.dart';
+
 class Blog {
   final List<BlogSpan> content; // Change this to List<BlogSpan>
   final String url;
@@ -33,6 +34,15 @@ class Blog {
               style: span.style,
             ))
         .toList();
+  }
+
+  // Add a method to get the media information if available
+  dynamic get media {
+    if (this is ImageBlock) {
+      return (this as ImageBlock).url;
+    } else {
+      return null; // Handle other cases if needed
+    }
   }
 
   factory Blog.fromJson(Map<String, dynamic> json) {
